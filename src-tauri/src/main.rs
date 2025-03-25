@@ -5,24 +5,24 @@
 )]
 
 #[tauri::command]
-async fn create_window(app: tauri::AppHandle) {
-    let window = tauri::window::WindowBuilder::new(&app, "label")
+async fn _create_window(app: tauri::AppHandle) -> tauri::WebviewWindow {
+    use tauri::{WebviewUrl, WebviewWindowBuilder};
+
+    WebviewWindowBuilder::new(&app, "label", WebviewUrl::App("index.html".into()))
         .build()
-        .unwrap();
+        .unwrap()
 }
 
 fn main() {
-    use tauri::async_runtime as rt;
-    use tauri::Window;
-
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .setup(move |app| {
             use tauri::Manager;
-            let window = app.get_window("main").unwrap();
+            let window = app.get_webview_window("main").unwrap();
             window.maximize().unwrap();
             let hwnd = window.hwnd().unwrap().0;
             let _pre_val;
-            let hwnd = windows::Win32::Foundation::HWND(hwnd);
+            let hwnd = windows::Win32::Foundation::HWND(hwnd as isize);
             unsafe {
                 use windows::Win32::UI::WindowsAndMessaging::*;
                 let nindex = GWL_EXSTYLE;
