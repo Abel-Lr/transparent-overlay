@@ -4,6 +4,8 @@
     windows_subsystem = "windows"
 )]
 
+use std::env;
+
 #[tauri::command]
 async fn _create_window(app: tauri::AppHandle) -> tauri::WebviewWindow {
     use tauri::{WebviewUrl, WebviewWindowBuilder};
@@ -11,6 +13,14 @@ async fn _create_window(app: tauri::AppHandle) -> tauri::WebviewWindow {
     WebviewWindowBuilder::new(&app, "label", WebviewUrl::App("index.html".into()))
         .build()
         .unwrap()
+}
+
+#[tauri::command]
+fn get_url() -> String {
+    let args: Vec<String> = env::args().collect();
+    let url = &args[1];
+    println!("{}", url);
+    url.into()
 }
 
 fn main() {
@@ -35,6 +45,7 @@ fn main() {
             };
             Ok(())
         })
+        .invoke_handler(tauri::generate_handler![get_url])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
