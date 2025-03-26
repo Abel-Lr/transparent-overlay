@@ -10,9 +10,13 @@ use std::env;
 fn create_window_livechat(app: &tauri::AppHandle) -> tauri::WebviewWindow {
     use tauri::{WebviewUrl, WebviewWindowBuilder};
 
+    // TODO: Fix window size (force fullscreen)
     let window =
         WebviewWindowBuilder::new(app, "livechat", WebviewUrl::App("livechat.html".into()))
             .title("Transparent Overlay")
+            .transparent(true)
+            .decorations(false)
+            .always_on_top(true)
             .build()
             .unwrap();
     window.maximize().unwrap();
@@ -71,6 +75,7 @@ fn main() {
                 create_window_livechat(handle);
                 Ok(())
             })
+            .invoke_handler(tauri::generate_handler![get_url])
             .run(tauri::generate_context!())
             .expect("Error launching livechat window");
     }
