@@ -30,6 +30,7 @@ fn get_url() -> String {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|_, _, _| {}))
         .plugin(tauri_plugin_shell::init())
         .setup(move |app| {
             use tauri::Manager;
