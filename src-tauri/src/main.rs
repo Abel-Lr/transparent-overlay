@@ -5,6 +5,11 @@
 )]
 
 use std::env;
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::TrayIconBuilder,
+    App,
+};
 
 #[tauri::command]
 async fn _create_window(app: tauri::AppHandle) -> tauri::WebviewWindow {
@@ -30,6 +35,7 @@ fn main() {
             use tauri::Manager;
             let window = app.get_webview_window("main").unwrap();
             window.maximize().unwrap();
+            window.set_skip_taskbar(true).unwrap();
             let hwnd = window.hwnd().unwrap().0;
             let _pre_val;
             let hwnd = windows::Win32::Foundation::HWND(hwnd as isize);
@@ -43,9 +49,29 @@ fn main() {
                     | WS_EX_TOPMOST;
                 _pre_val = SetWindowLongA(hwnd, nindex, style.0 as i32);
             };
+            setup_tray(app);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![get_url])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+fn setup_tray(app: &App) {
+    let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>).unwrap();
+    let menu = Menu::with_items(app, &[&quit_i]).unwrap();
+
+    TrayIconBuilder::new()
+        .icon(app.default_window_icon().unwrap().clone())
+        .menu(&menu)
+        .on_menu_event(|app, event| match event.id.as_ref() {
+            "quit" => {
+                app.exit(0);
+            }
+            _ => {
+                println!("menu item {:?} not handled", event.id);
+            }
+        })
+        .build(app)
+        .expect("Failed to build tray");
 }
