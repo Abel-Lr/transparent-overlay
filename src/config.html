@@ -5,11 +5,12 @@
     <link rel="stylesheet" href="styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mediachat</title>
-    <script type="module" src="/main.js" defer></script>
+    <script type="module" src="/launch.js" defer></script>
+    <script type="module" src="/info_bubble.js"></script>
   </head>
   <body
     id="content"
-    class="flex justify-center h-full items-center my-2 select-none"
+    class="flex justify-center h-full items-center my-2 select-none overflow-hidden"
   >
     <div class="flex flex-col justify-around h-full">
       <h1 class="text-center font-medium">Welcome to Transparent Overlay</h1>
@@ -18,13 +19,37 @@
         class="h-fit fieldset w-xs bg-base-200 border border-base-300 p-4 rounded-box"
       >
         <legend class="fieldset-legend">Config</legend>
-        <div class="input focus:outline-none focus-within:outline-none">
-          <div class="flex justify-center items-center h-full border-r border-r-white/20 border-opacity-0 pr-2">
+        <div
+          class="relative input focus:outline-none focus-within:outline-none pr-0"
+          id="input_wrapper"
+        >
+          <div
+            class="flex justify-center items-center h-full border-r border-r-white/20 border-opacity-0 pr-2"
+          >
             <label class="" for="url">URL</label>
           </div>
-          <input type="text" class="grow" placeholder="" id="url" autocomplete="off"/>
+          <input
+            type="text"
+            class="grow"
+            placeholder=""
+            id="url"
+            autocomplete="off"
+          />
+          <div
+            class="tooltip tooltip-left tooltip-open absolute invisible"
+            id="tooltip"
+          >
+            <div class="tooltip-content w-[50vw]">
+              <div>This... uh... t-this isn't an actual URL~ 😓👉👈</div>
+            </div>
+            <img
+              class="text-lg w-6"
+              id="emoji-warning"
+              src="./assets/flushed_emoji.png"
+            />
+          </div>
         </div>
-        <button class="btn btn-primary mt-2">Launch</button>
+        <button class="btn btn-primary mt-2" id="launch">Launch</button>
       </fieldset>
     </div>
   </body>

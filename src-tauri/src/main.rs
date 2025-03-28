@@ -5,14 +5,20 @@
 )]
 
 use std::env;
+use tauri::{webview, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 #[tauri::command]
-fn create_window_livechat(app: &tauri::AppHandle) -> tauri::WebviewWindow {
-    use tauri::{WebviewUrl, WebviewWindowBuilder};
+fn create_window_livechat(app: &tauri::AppHandle, url: String) -> WebviewWindow {
+    let url: webview::Url = match url.trim().parse() {
+        Ok(parsed_url) => parsed_url,
+        Err(_) => {
+            create_warning_window();
+            panic!("Error parsing URL");
+        }
+    };
 
-    // TODO: Fix window size (force fullscreen)
-    let window =
-        WebviewWindowBuilder::new(app, "livechat", WebviewUrl::App("livechat.html".into()))
+    let window: WebviewWindow =
+        WebviewWindowBuilder::new(app, "livechat", WebviewUrl::External(url))
             .title("Transparent Overlay")
             .transparent(true)
             .decorations(false)
@@ -34,48 +40,74 @@ fn create_window_livechat(app: &tauri::AppHandle) -> tauri::WebviewWindow {
 }
 
 #[tauri::command]
-fn get_url() -> String {
+fn get_url_from_arg() -> String {
     let args: Vec<String> = env::args().collect();
     let url = &args[1];
     println!("{}", url);
     url.into()
 }
 
-fn create_config_window(app: &tauri::AppHandle) -> tauri::WebviewWindow {
-    use tauri::{WebviewUrl, WebviewWindowBuilder};
+#[tauri::command]
+fn create_warning_window() {
+    use std::ptr::null_mut as NULL;
+    use winapi::um::winuser;
 
-    let window = WebviewWindowBuilder::new(app, "config", WebviewUrl::App("config.html".into()))
-        .title("Transparent Overlay - Config")
-        .resizable(false)
-        .center()
-        .inner_size(350.0, 250.0)
-        .maximizable(false)
-        .build()
-        .unwrap();
+    let l_msg: Vec<u16> = "Invalid URL to parse\0".encode_utf16().collect();
+    let l_title: Vec<u16> = "Error parsing URL\0".encode_utf16().collect();
+
+    unsafe {
+        winuser::MessageBoxW(
+            NULL(),
+            l_msg.as_ptr(),
+            l_title.as_ptr(),
+            winuser::MB_OK | winuser::MB_ICONEXCLAMATION,
+        );
+    }
+}
+
+#[tauri::command]
+fn url_is_parsable(url: String) -> bool {
+    match url.trim().parse::<webview::Url>() {
+        Ok(_) => true,
+        Err(_) => false,
+    }
+}
+
+fn create_config_window(app: &tauri::AppHandle) -> WebviewWindow {
+    let window: WebviewWindow =
+        WebviewWindowBuilder::new(app, "config", WebviewUrl::App("config.html".into()))
+            .title("Transparent Overlay - Config")
+            .resizable(false)
+            .center()
+            .inner_size(350.0, 250.0)
+            .maximizable(false)
+            .build()
+            .unwrap();
     window
 }
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        println!("Error : [No URL Provided]");
-        println!("Example usage : {} http://example.com", &args[0]);
         tauri::Builder::default()
             .setup(|app| {
                 let handle = app.handle();
                 create_config_window(handle);
                 Ok(())
             })
+            .invoke_handler(tauri::generate_handler![url_is_parsable, create_warning_window])
             .run(tauri::generate_context!())
             .expect("Error launching config window");
     } else {
         tauri::Builder::default()
             .setup(|app| {
                 let handle = app.handle();
-                create_window_livechat(handle);
+                create_window_livechat(handle, get_url_from_arg())
+                    .maximize()
+                    .unwrap();
                 Ok(())
             })
-            .invoke_handler(tauri::generate_handler![get_url])
+            .invoke_handler(tauri::generate_handler![get_url_from_arg])
             .run(tauri::generate_context!())
             .expect("Error launching livechat window");
     }

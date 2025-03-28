@@ -17,6 +17,7 @@ windows = { version = "0.36.1", features = [
     "Win32_Foundation",
     "Win32_UI_WindowsAndMessaging",
 ] }
+winapi = { version = "0.3", features = ["winuser"] }
 tauri-plugin-shell = "2"
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
