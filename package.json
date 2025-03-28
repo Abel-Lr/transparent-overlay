@@ -6,14 +6,15 @@
   "scripts": {
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "build:css": "npx @tailwindcss/cli -i ./src/tailwind.css -o ./src/styles.css --watch"
+    "build:css": "npx @tailwindcss/cli -i ./src/tailwind.css -o ./src/styles.css --minify",
+    "dev:css": "npx @tailwindcss/cli -i ./src/tailwind.css -o ./src/styles.css --watch"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
-    "daisyui": "^5.0.9",
     "tailwindcss": "^4.0.17"
   },
   "dependencies": {
-    "@tailwindcss/cli": "^4.0.17"
+    "@tailwindcss/cli": "^4.0.17",
+    "daisyui": "^5.0.9"
   }
 }
