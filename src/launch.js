@@ -15,14 +15,21 @@ launch_button.addEventListener("click", () => {
     if (!result) {
       if (timeout_id) clearTimeout(timeout_id);
 
-      div_input.classList.add("input-error");
+      div_input.classList.toggle("input-error", true);
       tooltip.classList.toggle("invisible", false);
       tooltip.classList.toggle("tooltip-open", true);
       timeout_id = setTimeout(() => {
         tooltip.classList.toggle("tooltip-open", false);
       }, 2000);
     } else {
-      // TODO : Open Livechat window with URL url_input.value
+      div_input.classList.toggle("input-error", false);
+      tooltip.classList.toggle("invisible", true);
+      tooltip.classList.toggle("tooltip-open", false);
+      invoke("build_livechat_window_from_config", {
+        url: url_input.value,
+      }).then(() => {
+        invoke("close_config_window");
+      });
     }
   });
 });
