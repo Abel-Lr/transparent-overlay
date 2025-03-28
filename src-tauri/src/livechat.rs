@@ -1,10 +1,4 @@
-use std::env;
-
-use tauri::{
-    menu::{Menu, MenuItem},
-    tray::TrayIconBuilder,
-    webview, App, AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder,
-};
+use tauri::{webview, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 use crate::warning::create_warning_window;
 

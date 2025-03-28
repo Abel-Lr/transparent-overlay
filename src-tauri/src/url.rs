@@ -11,8 +11,5 @@ pub fn get_url_from_arg() -> String {
 
 #[tauri::command]
 pub fn url_is_parsable(url: String) -> bool {
-    match url.trim().parse::<webview::Url>() {
-        Ok(_) => true,
-        Err(_) => false,
-    }
+    url.trim().parse::<webview::Url>().is_ok()
 }
