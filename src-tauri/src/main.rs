@@ -12,7 +12,7 @@ use tauri::{
   Manager,
   WebviewUrl,
   WebviewWindow,
-  WebviewWindowBuilder
+  WebviewWindowBuilder,
   menu::{Menu, MenuItem},
   tray::TrayIconBuilder,
   App
@@ -51,7 +51,6 @@ fn create_window_livechat(app: &tauri::AppHandle, url: &str) -> Result<WebviewWi
                     | WS_EX_TOPMOST;
                 _pre_val = SetWindowLongA(hwnd, nindex, style.0 as i32);
             };
-            setup_tray(app);
             Ok(w)
         }
         Err(e) => Err(format!(
@@ -135,6 +134,7 @@ fn main() {
             .setup(|app| {
                 let handle = app.handle();
                 create_config_window(handle);
+                setup_tray(app);
                 Ok(())
             })
             .invoke_handler(tauri::generate_handler![
@@ -149,11 +149,11 @@ fn main() {
             .plugin(tauri_plugin_single_instance::init(|_, _, _| {}))
             .plugin(tauri_plugin_shell::init())
             .setup(move |app| {
-                use tauri::Manager;
                 let handle = app.handle();
                 create_window_livechat(handle, &get_url_from_arg())?
                     .maximize()
                     .unwrap();
+                setup_tray(app);
                 Ok(())
             })
             .invoke_handler(tauri::generate_handler![get_url_from_arg])
@@ -171,7 +171,7 @@ fn setup_tray(app: &App) {
         .menu(&menu)
         .on_menu_event(|app, event| match event.id.as_ref() {
             "quit" => {
-                app.exit(0);
+                app.exit(0x0);
             }
             _ => {
                 println!("menu item {:?} not handled", event.id);

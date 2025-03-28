@@ -12,10 +12,15 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/installerIcon.ico"
+      }
+    }
   },
-  "productName": "transparent-overlay",
-  "mainBinaryName": "transparent-overlay",
+  "productName": "Transparent Overlay",
+  "mainBinaryName": "Transparent Overlay",
   "version": "0.1.0",
   "identifier": "com.transparent-overlay.app",
   "plugins": {},
