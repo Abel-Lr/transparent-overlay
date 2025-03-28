@@ -5,7 +5,18 @@
 )]
 
 use std::env;
-use tauri::{webview, AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
+
+use tauri::{
+  webview,
+  AppHandle,
+  Manager,
+  WebviewUrl,
+  WebviewWindow,
+  WebviewWindowBuilder
+  menu::{Menu, MenuItem},
+  tray::TrayIconBuilder,
+  App
+};
 
 fn create_window_livechat(app: &tauri::AppHandle, url: &str) -> Result<WebviewWindow, String> {
     let url: webview::Url = match url.trim().parse() {
@@ -26,6 +37,7 @@ fn create_window_livechat(app: &tauri::AppHandle, url: &str) -> Result<WebviewWi
     match window {
         Ok(w) => {
             w.maximize().unwrap();
+            w.set_skip_taskbar(true).unwrap();
             let hwnd = w.hwnd().unwrap().0;
             let _pre_val;
             let hwnd = windows::Win32::Foundation::HWND(hwnd as isize);
@@ -39,6 +51,7 @@ fn create_window_livechat(app: &tauri::AppHandle, url: &str) -> Result<WebviewWi
                     | WS_EX_TOPMOST;
                 _pre_val = SetWindowLongA(hwnd, nindex, style.0 as i32);
             };
+            setup_tray(app);
             Ok(w)
         }
         Err(e) => Err(format!(
@@ -133,7 +146,10 @@ fn main() {
             .expect("Error launching config window");
     } else {
         tauri::Builder::default()
-            .setup(|app| {
+            .plugin(tauri_plugin_single_instance::init(|_, _, _| {}))
+            .plugin(tauri_plugin_shell::init())
+            .setup(move |app| {
+                use tauri::Manager;
                 let handle = app.handle();
                 create_window_livechat(handle, &get_url_from_arg())?
                     .maximize()
@@ -144,4 +160,23 @@ fn main() {
             .run(tauri::generate_context!())
             .expect("Error launching livechat window");
     }
+}
+
+fn setup_tray(app: &App) {
+    let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>).unwrap();
+    let menu = Menu::with_items(app, &[&quit_i]).unwrap();
+
+    TrayIconBuilder::new()
+        .icon(app.default_window_icon().unwrap().clone())
+        .menu(&menu)
+        .on_menu_event(|app, event| match event.id.as_ref() {
+            "quit" => {
+                app.exit(0);
+            }
+            _ => {
+                println!("menu item {:?} not handled", event.id);
+            }
+        })
+        .build(app)
+        .expect("Failed to build tray");
 }
