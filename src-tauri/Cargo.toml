@@ -19,6 +19,7 @@ windows = { version = "0.36.1", features = [
 ] }
 winapi = { version = "0.3", features = ["winuser"] }
 tauri-plugin-shell = "2"
+tauri-plugin-store = "2"
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]

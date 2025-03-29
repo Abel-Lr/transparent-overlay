@@ -1,20 +1,36 @@
-use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
+use std::fmt::Display;
 
-#[tauri::command]
-pub async fn close_config_window(app: AppHandle) {
-    app.get_webview_window("config")
-        .map(|window| window.close().expect("Error Closing the config window"))
-        .expect("Can't find config window");
+use serde::{Deserialize, Serialize};
+use tauri::AppHandle;
+use tauri_plugin_store::StoreExt;
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Config {
+    pub url: String,
 }
 
-pub fn create_config_window(app: &tauri::AppHandle) -> WebviewWindow {
-    WebviewWindowBuilder::new(app, "config", WebviewUrl::App("config.html".into()))
-        .title("Transparent Overlay - Config")
-        .resizable(false)
-        .center()
-        .inner_size(350.0, 250.0)
-        .maximizable(false)
-        .theme(Some(tauri::Theme::Dark))
-        .build()
-        .unwrap()
+impl Config {
+    pub fn load(app: &AppHandle) -> Self {
+        let store = app.store("store.json").unwrap();
+        store
+            .get("config")
+            .map(|val| serde_json::from_value(val).unwrap())
+            .unwrap_or_else(Config::empty)
+    }
+
+    pub fn save(&self, app: &AppHandle) {
+        let store = app.store("store.json").unwrap();
+        let value = serde_json::to_value(self).expect("failed to serialize config");
+        store.set("config", value);
+    }
+
+    pub fn empty() -> Self {
+        Config { url: "".into() }
+    }
+}
+
+impl Display for Config {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }

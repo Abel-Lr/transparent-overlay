@@ -1,9 +1,12 @@
 use tauri::{webview, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
-use crate::warning::create_warning_window;
+use crate::{config::Config, warning::create_warning_window};
 
-pub fn create_window_livechat(app: &tauri::AppHandle, url: &str) -> Result<WebviewWindow, String> {
-    let url: webview::Url = match url.trim().parse() {
+pub fn create_window_livechat(
+    app: &tauri::AppHandle,
+    config: &Config,
+) -> Result<WebviewWindow, String> {
+    let url: webview::Url = match config.url.trim().parse() {
         Ok(parsed_url) => parsed_url,
         Err(_) => {
             create_warning_window();
@@ -45,15 +48,8 @@ pub fn create_window_livechat(app: &tauri::AppHandle, url: &str) -> Result<Webvi
 }
 
 #[tauri::command]
-pub async fn build_livechat_window_from_config(
-    app: tauri::AppHandle,
-    url: &str,
-) -> Result<(), String> {
-    match create_window_livechat(&app, url) {
-        Ok(_) => Ok(()),
-        Err(e) => Err(format!(
-            "Cannot create livechat window with url {} : {}",
-            url, e
-        )),
-    }
+pub async fn open_livechat_window(app: tauri::AppHandle, config: Config) -> Result<(), String> {
+    create_window_livechat(&app, &config)
+        .map(|_| ())
+        .map_err(|_| format!("Cannot create livechat window with config {}", config))
 }

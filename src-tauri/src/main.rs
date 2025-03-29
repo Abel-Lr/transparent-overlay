@@ -6,12 +6,14 @@
 
 use std::env;
 
-use config::{close_config_window, create_config_window};
-use livechat::{build_livechat_window_from_config, create_window_livechat};
+use config::Config;
+use config_window::{close_config_window, create_config_window, get_config, save_config};
+use livechat::{create_window_livechat, open_livechat_window};
 use tray::setup_tray;
 use url::{get_url_from_arg, url_is_parsable};
 
 mod config;
+mod config_window;
 mod livechat;
 mod tray;
 mod url;
@@ -20,15 +22,16 @@ mod warning;
 fn main() {
     let args: Vec<String> = env::args().collect();
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_single_instance::init(|_, _, _| {}))
         .plugin(tauri_plugin_shell::init())
         .setup(move |app| {
             let handle = app.handle();
-
+            // let config = Config::load(&handle);
             if args.len() < 2 {
                 create_config_window(handle);
             } else {
-                create_window_livechat(handle, &get_url_from_arg())?
+                create_window_livechat(handle, &Config::empty())?
                     .maximize()
                     .unwrap();
             }
@@ -39,8 +42,10 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_url_from_arg,
             url_is_parsable,
-            build_livechat_window_from_config,
-            close_config_window
+            open_livechat_window,
+            close_config_window,
+            get_config,
+            save_config
         ])
         .run(tauri::generate_context!())
         .expect("Error launching window");

@@ -25,16 +25,34 @@ launch_button.addEventListener("click", () => {
       div_input.classList.toggle("input-error", false);
       tooltip.classList.toggle("invisible", true);
       tooltip.classList.toggle("tooltip-open", false);
-      invoke("build_livechat_window_from_config", {
-        url: url_input.value,
+
+      invoke("save_config", {
+        config: getConfig()
+      });
+
+      invoke("open_livechat_window", {
+        config: getConfig()
       }).then(() => {
         invoke("close_config_window");
       });
+
     }
   });
 });
+
+function getConfig() {
+  return {
+    url: url_input.value
+  }
+}
 
 url_input.addEventListener("focus", () => {
   // div_input.classList.toggle("input-error", false);
   tooltip.classList.toggle("tooltip-open", false);
 });
+
+window.addEventListener("load", () => {
+  invoke("get_config").then((config) => {
+    url_input.value = config.url
+  })
+})
