@@ -20,11 +20,12 @@ pub fn create_window_livechat(
             .transparent(true)
             .decorations(false)
             .always_on_top(true)
+            .skip_taskbar(true)
             .build();
+
     match window {
         Ok(w) => {
             w.maximize().unwrap();
-            w.set_skip_taskbar(true).unwrap();
             let hwnd = w.hwnd().unwrap().0;
             let _pre_val;
             let hwnd = windows::Win32::Foundation::HWND(hwnd as isize);
