@@ -15,6 +15,7 @@ pub fn setup_tray(app: &App) {
 
     TrayIconBuilder::new()
         .icon(app.default_window_icon().unwrap().clone())
+        .tooltip("Transparent Overlay")
         .menu(&menu)
         .on_menu_event(|app, event| match event.id.as_ref() {
             "quit" => {
