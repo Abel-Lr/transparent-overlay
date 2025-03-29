@@ -11,7 +11,7 @@ pub async fn close_config_window(app: AppHandle) {
 
 #[tauri::command]
 pub fn get_config(app: AppHandle) -> Config {
-    Config::load(&app)
+    Config::load(&app).unwrap_or_else(Config::empty)
 }
 
 #[tauri::command]

@@ -20,21 +20,21 @@ mod url;
 mod warning;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
     tauri::Builder::default()
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_single_instance::init(|_, _, _| {}))
         .plugin(tauri_plugin_shell::init())
         .setup(move |app| {
             let handle = app.handle();
-            // let config = Config::load(&handle);
-            if args.len() < 2 {
-                create_config_window(handle);
-            } else {
-                create_window_livechat(handle, &Config::empty())?
-                    .maximize()
-                    .unwrap();
-            }
+
+            match Config::load(handle) {
+                Some(config) => {
+                    create_window_livechat(handle, &config)?.maximize().unwrap();
+                }
+                None => {
+                    create_config_window(handle);
+                }
+            };
 
             setup_tray(app);
             Ok(())

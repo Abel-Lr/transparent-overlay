@@ -10,12 +10,11 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn load(app: &AppHandle) -> Self {
+    pub fn load(app: &AppHandle) -> Option<Self> {
         let store = app.store("store.json").unwrap();
         store
             .get("config")
             .map(|val| serde_json::from_value(val).unwrap())
-            .unwrap_or_else(Config::empty)
     }
 
     pub fn save(&self, app: &AppHandle) {
