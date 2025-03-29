@@ -1,4 +1,4 @@
-use tauri::{webview, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
+use tauri::{webview, AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 use crate::{config::Config, warning::create_warning_window};
 
@@ -45,6 +45,12 @@ pub fn create_window_livechat(
             url, e
         )),
     }
+}
+
+pub fn close_livechat(app: &AppHandle) {
+    app.get_webview_window("livechat")
+        .map(|window| window.close().expect("Error Closing the livechat window"))
+        .expect("Can't find livechat window");
 }
 
 #[tauri::command]
