@@ -49,9 +49,9 @@ pub fn create_window_livechat(
 }
 
 pub fn close_livechat(app: &AppHandle) {
-    app.get_webview_window("livechat")
-        .map(|window| window.close().expect("Error Closing the livechat window"))
-        .expect("Can't find livechat window");
+    if let Some(window) = app.get_webview_window("livechat") {
+        window.close().expect("Error closing the livechat window");
+    }
 }
 
 #[tauri::command]

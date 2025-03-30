@@ -20,6 +20,13 @@ pub fn save_config(app: AppHandle, config: Config) {
 }
 
 pub fn create_config_window(app: &tauri::AppHandle) -> WebviewWindow {
+    if let Some(window) = app.get_webview_window("config") {
+        window.set_focus().unwrap();
+        if window.is_minimized().unwrap() {
+            window.unminimize().unwrap();
+        }
+        return window;
+    }
     WebviewWindowBuilder::new(app, "config", WebviewUrl::App("config.html".into()))
         .title("Transparent Overlay - Config")
         .resizable(false)
