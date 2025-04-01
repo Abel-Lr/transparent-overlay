@@ -7,7 +7,9 @@
 use std::env;
 
 use config::Config;
-use config_window::{close_config_window, create_config_window, get_config, save_config};
+use config_window::{
+    close_config_window, create_config_window, get_available_monitors, get_config, save_config,
+};
 use livechat::{create_window_livechat, open_livechat_window};
 use tray::setup_tray;
 use url::{get_url_from_arg, url_is_parsable};
@@ -45,7 +47,8 @@ fn main() {
             open_livechat_window,
             close_config_window,
             get_config,
-            save_config
+            save_config,
+            get_available_monitors
         ])
         .run(tauri::generate_context!())
         .expect("Error launching window");

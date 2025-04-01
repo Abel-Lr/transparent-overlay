@@ -1,2 +1,8 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+select > option {
+    color: black;
+    margin-left: 1rem;
+    margin-right: 1rem;
+}

@@ -1,6 +1,6 @@
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
-use crate::config::Config;
+use crate::config::{Config, MonitorPos};
 
 #[tauri::command]
 pub async fn close_config_window(app: AppHandle) {
@@ -19,6 +19,19 @@ pub fn save_config(app: AppHandle, config: Config) {
     config.save(&app);
 }
 
+#[tauri::command]
+pub fn get_available_monitors(app: AppHandle) -> Vec<MonitorPos> {
+    app.available_monitors()
+        .unwrap()
+        .iter()
+        .enumerate()
+        .map(|(_, monitor)| MonitorPos {
+            name: monitor.name().unwrap().into(),
+            pos_x: monitor.position().x,
+        })
+        .collect()
+}
+
 pub fn create_config_window(app: &tauri::AppHandle) -> WebviewWindow {
     if let Some(window) = app.get_webview_window("config") {
         window.set_focus().unwrap();
@@ -31,7 +44,7 @@ pub fn create_config_window(app: &tauri::AppHandle) -> WebviewWindow {
         .title("Transparent Overlay - Config")
         .resizable(false)
         .center()
-        .inner_size(350.0, 250.0)
+        .inner_size(350.0, 275.0)
         .maximizable(false)
         .theme(Some(tauri::Theme::Dark))
         .build()
