@@ -21,6 +21,7 @@ pub fn create_window_livechat(
             .decorations(false)
             .always_on_top(true)
             .skip_taskbar(true)
+            .position(config.monitor.pos_x.into(), 0.0)
             .build();
 
     match window {
