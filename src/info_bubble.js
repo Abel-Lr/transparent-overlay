@@ -10,7 +10,6 @@ emoji_warning.addEventListener("click", () => {
 
 window.addEventListener("load", () => {
   let emoji_dim = emoji_warning.getBoundingClientRect();
-  console.log(emoji_dim);
   tooltip.style.top = `-${emoji_dim.height / 2}px`;
   tooltip.style.right = `-${emoji_dim.width / 2}px`;
 });
