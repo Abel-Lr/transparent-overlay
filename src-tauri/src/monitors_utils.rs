@@ -115,3 +115,11 @@ pub fn get_monitor_infos() -> Option<Vec<MonitorPos>> {
         Some(monitors)
     }
 }
+
+pub fn get_primary_monitor(monitor_vec: Vec<MonitorPos>) -> MonitorPos {
+    monitor_vec
+        .iter()
+        .find(|m| m.pos_x == 0)
+        .cloned()
+        .unwrap_or_else(|| monitor_vec[0].clone())
+}
