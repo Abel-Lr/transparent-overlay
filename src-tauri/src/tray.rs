@@ -21,14 +21,11 @@ pub fn setup_tray(app: &App) {
             "quit" => {
                 app.exit(0x0);
             }
-            "reload" => app
-                .get_webview_window("livechat")
-                .map(|window| {
-                    window
-                        .reload()
-                        .expect("Error reloading the livechat window")
-                })
-                .expect("Can't find the livechat window"),
+            "reload" => {
+                if let Some(livechat_window) = app.get_webview_window("livechat") {
+                    livechat_window.reload().unwrap()
+                }
+            }
             "config" => {
                 create_config_window(app.app_handle());
                 close_livechat(app);
