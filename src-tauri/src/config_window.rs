@@ -1,7 +1,7 @@
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 use crate::config::{Config, MonitorPos};
-use crate::monitors_utils::get_monitor_names;
+use crate::monitors_utils::get_monitor_infos;
 
 #[tauri::command]
 pub async fn close_config_window(app: AppHandle) {
@@ -21,8 +21,8 @@ pub fn save_config(app: AppHandle, config: Config) {
 }
 
 #[tauri::command]
-pub fn get_available_monitors(app: AppHandle) -> Vec<MonitorPos> {
-    unsafe { get_monitor_names().unwrap() }
+pub fn get_available_monitors(_app: AppHandle) -> Vec<MonitorPos> {
+    get_monitor_infos().unwrap()
 }
 
 pub fn create_config_window(app: &tauri::AppHandle) -> WebviewWindow {
